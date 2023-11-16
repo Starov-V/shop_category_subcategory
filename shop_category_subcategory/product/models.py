@@ -1,5 +1,8 @@
 from django.db import models
 from users.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 class Category(models.Model):
     name = models.CharField(
@@ -58,6 +61,11 @@ class Cart(models.Model):
         on_delete=models.CASCADE,
         related_name='cart'
     )
+
+    @receiver(post_save, sender=User)
+    def cart_create(sender, instance, created=False,  **kwargs):
+        if created:
+            Cart.objects.create(user=instance)
 
 
 class ProductCart(models.Model):
